@@ -1,0 +1,38 @@
+﻿  Main.cpp
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(37,46): warning C4244: '=': conversion from 'T' to 'float', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(37,46): warning C4244:         with
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(37,46): warning C4244:         [
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(37,46): warning C4244:             T=unsigned int
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(37,46): warning C4244:         ]
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,59): warning C4244: 'argument': conversion from 'float' to 'T', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,59): warning C4244:         with
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,59): warning C4244:         [
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,59): warning C4244:             T=int
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,59): warning C4244:         ]
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,52): warning C4244: 'argument': conversion from 'float' to 'T', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,52): warning C4244:         with
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,52): warning C4244:         [
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,52): warning C4244:             T=int
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(41,52): warning C4244:         ]
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,68): warning C4244: 'argument': conversion from 'float' to 'T', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,68): warning C4244:         with
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,68): warning C4244:         [
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,68): warning C4244:             T=int
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,68): warning C4244:         ]
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,61): warning C4244: 'argument': conversion from 'float' to 'T', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,61): warning C4244:         with
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,61): warning C4244:         [
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,61): warning C4244:             T=int
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,61): warning C4244:         ]
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244: 'argument': conversion from '_Ty' to 'T', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244:         with
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244:         [
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244:             _Ty=float
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244:         ]
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244:         and
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244:         [
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244:             T=int
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(50,55): warning C4244:         ]
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(232,17): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(233,18): warning C4244: 'initializing': conversion from 'unsigned int' to 'float', possible loss of data
+  ITI Mini Jam.vcxproj -> G:\iti\ITI Mini Jam\x64\Debug\ITI Mini Jam.exe
