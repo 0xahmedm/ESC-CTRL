@@ -26,7 +26,7 @@ public:
 
         for (int i = 0; i < layerCount; i++)
         {
-            string filename = "background_" + to_string(i + 1) + ".png";
+            string filename = "Assets/Backgrounds/background_" + to_string(i + 1) + ".png";
 
             if (!textures[i].loadFromFile(filename))
                 cerr << "Can't load " << filename << endl;
@@ -100,9 +100,9 @@ public:
 
     Player()
     {
-        if (!tIdle.loadFromFile("idle.png") ||
-            !tRun.loadFromFile("run.png") ||
-            !tJump.loadFromFile("jump.png"))
+        if (!tIdle.loadFromFile("Assets/Character/idle.png") ||
+            !tRun.loadFromFile("Assets/Character/run.png") ||
+            !tJump.loadFromFile("Assets/Character/jump.png"))
         {
             cout << "ERROR loading player animations!\n";
         }
