@@ -115,7 +115,7 @@ public:
 
     Clock animClock;
 
-    float spriteScale = 0.14f;
+    float spriteScale = 0.2f;
 
     Player()
     {
@@ -131,7 +131,7 @@ public:
         sprite.setScale(spriteScale, spriteScale);
         sprite.setOrigin(frameW / 2.f, frameH / 2.f);
 
-        hitbox.setSize({ 40.f, 110.f });
+        hitbox.setSize({ 40.f, 150.f });
         hitbox.setOrigin(20, 40);
         hitbox.setPosition(300, 300);
         hitbox.setFillColor(Color::Transparent);
@@ -307,8 +307,18 @@ int main()
     Clock dtClock;
 
     // --- MAIN MENU SETUP ---
-    enum GameState { MENU, PLAYING, OPTIONS };
+    enum GameState { MENU, PLAYING,OPTIONS };
     GameState gameState = MENU;
+
+    // Menu background
+    Texture tMenuBg;
+    if (!tMenuBg.loadFromFile("Assets/MenusBackgrounds/MainMenu.png"))
+        cerr << "Error loading menu background!" << endl;
+    Sprite menuBg(tMenuBg);
+    menuBg.setScale(
+        WIDTH / tMenuBg.getSize().x,
+        HEIGHT / tMenuBg.getSize().y
+    );
 
     // Button textures
     Texture tStart, tStartHover, tOptions, tOptionsHover, tExit, tExitHover;
@@ -323,19 +333,13 @@ int main()
     }
 
     Sprite btnStart(tStart), btnOptions(tOptions), btnExit(tExit);
-
-	btnExit.setScale(0.8f, 0.8f);
-	btnOptions.setScale(0.8f, 0.8f);
-	btnStart.setScale(0.8f, 0.8f);
-
-
     btnStart.setOrigin(tStart.getSize().x / 2.f, tStart.getSize().y / 2.f);
     btnOptions.setOrigin(tOptions.getSize().x / 2.f, tOptions.getSize().y / 2.f);
     btnExit.setOrigin(tExit.getSize().x / 2.f, tExit.getSize().y / 2.f);
 
-    btnStart.setPosition(WIDTH / 2, HEIGHT / 2 - 175);
-    btnOptions.setPosition(WIDTH / 2, HEIGHT / 2);
-    btnExit.setPosition(WIDTH / 2, HEIGHT / 2 + 175);
+    btnStart.setPosition((WIDTH / 2) + 350, ((HEIGHT / 2) + 150) - 150);
+    btnOptions.setPosition((WIDTH / 2) + 350, (HEIGHT / 2) + 150);
+    btnExit.setPosition((WIDTH / 2) + 350, ((HEIGHT / 2) + 150) + 150);
 
     while (window.isOpen())
     {
@@ -354,6 +358,14 @@ int main()
         if (gameState == MENU)
         {
             Vector2i mousePos = Mouse::getPosition(window);
+
+            // Draw menu background
+            window.draw(menuBg);
+
+            btnExit.setScale(0.8f, 0.8f);
+            btnOptions.setScale(0.8f, 0.8f);
+            btnStart.setScale(0.8f, 0.8f);
+
 
             // Update hover states
             btnStart.setTexture(btnStart.getGlobalBounds().contains(mousePos.x, mousePos.y) ? tStartHover : tStart);
@@ -375,7 +387,7 @@ int main()
                     window.close();
 
                 if (btnOptions.getGlobalBounds().contains(mousePos.x, mousePos.y))
-                    cout << "Options button clicked!" << endl;
+					gameState = OPTIONS;
             }
         }
         else if (gameState == PLAYING)
