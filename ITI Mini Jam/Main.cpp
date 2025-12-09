@@ -1,5 +1,7 @@
 ﻿#include <SFML/Graphics.hpp>
 #include <iostream>
+#include <vector>
+#include <cstdlib>
 using namespace sf;
 using namespace std;
 
@@ -86,35 +88,17 @@ class Player
 {
 public:
     Texture tIdle, tRun, tJump;
-
     Sprite sprite;
     RectangleShape hitbox;
-
-    int frameW = 1024;
-    int frameH = 1024;
-
-    int framesIdle = 3;
-    int framesRun = 6;
-    int framesJump = 6;
-
+    int frameW = 1024, frameH = 1024;
+    int framesIdle = 3, framesRun = 6, framesJump = 6;
     int currentState = 0;
-
     enum State { IDLE, RUN, JUMP };
-
-    float timeSince = 0;
-    float animSpeed = 0.09f;
-    int currentFrame = 0;
-    int maxFrames = 6;
-
-    bool facingRight = true;
-    bool onGround = false;
-
-    float speed = 5.f;
-    float gravity = 0.6f;
-    float velY = 0.f;
-
+    float timeSince = 0, animSpeed = 0.09f;
+    int currentFrame = 0, maxFrames = 6;
+    bool facingRight = true, onGround = false;
+    float speed = 5.f, gravity = 0.6f, velY = 0.f;
     Clock animClock;
-
     float spriteScale = 0.2f;
 
     Player()
@@ -179,18 +163,9 @@ public:
             currentState = newState;
             currentFrame = 0;
 
-            if (currentState == IDLE) {
-                sprite.setTexture(tIdle);
-                maxFrames = framesIdle;
-            }
-            if (currentState == RUN) {
-                sprite.setTexture(tRun);
-                maxFrames = framesRun;
-            }
-            if (currentState == JUMP) {
-                sprite.setTexture(tJump);
-                maxFrames = framesJump;
-            }
+            if (currentState == IDLE) { sprite.setTexture(tIdle); maxFrames = framesIdle; }
+            if (currentState == RUN) { sprite.setTexture(tRun); maxFrames = framesRun; }
+            if (currentState == JUMP) { sprite.setTexture(tJump); maxFrames = framesJump; }
         }
     }
 
@@ -198,12 +173,9 @@ public:
     {
         timeSince += animClock.restart().asSeconds();
 
-        if (currentState == IDLE)
-            animSpeed = 0.19f;
-        else if (currentState == RUN)
-            animSpeed = 0.09f;
-        else
-            animSpeed = 0.09f;
+        if (currentState == IDLE) animSpeed = 0.19f;
+        else if (currentState == RUN) animSpeed = 0.09f;
+        else animSpeed = 0.09f;
 
         if (timeSince >= animSpeed)
         {
@@ -229,15 +201,10 @@ public:
 
         if (!hb.intersects(pb)) return;
 
-        float hbLeft = hb.left;
-        float hbRight = hb.left + hb.width;
-        float hbTop = hb.top;
-        float hbBottom = hb.top + hb.height;
-
-        float pbLeft = pb.left;
-        float pbRight = pb.left + pb.width;
-        float pbTop = pb.top;
-        float pbBottom = pb.top + pb.height;
+        float hbLeft = hb.left, hbRight = hb.left + hb.width;
+        float hbTop = hb.top, hbBottom = hb.top + hb.height;
+        float pbLeft = pb.left, pbRight = pb.left + pb.width;
+        float pbTop = pb.top, pbBottom = pb.top + pb.height;
 
         float overlapLeft = hbRight - pbLeft;
         float overlapRight = pbRight - hbLeft;
@@ -291,7 +258,6 @@ int main()
     float WORLD_LEFT = 0;
     float WORLD_RIGHT = WIDTH * 10000;
 
-    // --- Player ---
     Player player;
 
     vector<float> speeds = { 0, 25 , 60, 110 , 120, 130, 140 };
@@ -306,21 +272,15 @@ int main()
 
     Clock dtClock;
 
-    // --- MAIN MENU SETUP ---
-    enum GameState { MENU, PLAYING,OPTIONS };
+    enum GameState { MENU, PLAYING, OPTIONS };
     GameState gameState = MENU;
 
-    // Menu background
     Texture tMenuBg;
     if (!tMenuBg.loadFromFile("Assets/MenusBackgrounds/MainMenu.png"))
         cerr << "Error loading menu background!" << endl;
     Sprite menuBg(tMenuBg);
-    menuBg.setScale(
-        WIDTH / tMenuBg.getSize().x,
-        HEIGHT / tMenuBg.getSize().y
-    );
+    menuBg.setScale(WIDTH / tMenuBg.getSize().x, HEIGHT / tMenuBg.getSize().y);
 
-    // Button textures
     Texture tStart, tStartHover, tOptions, tOptionsHover, tExit, tExitHover;
     if (!tStart.loadFromFile("Assets/Buttons/start.png") ||
         !tStartHover.loadFromFile("Assets/Buttons/start_hover.png") ||
@@ -340,6 +300,22 @@ int main()
     btnStart.setPosition((WIDTH / 2) + 350, ((HEIGHT / 2) + 150) - 150);
     btnOptions.setPosition((WIDTH / 2) + 350, (HEIGHT / 2) + 150);
     btnExit.setPosition((WIDTH / 2) + 350, ((HEIGHT / 2) + 150) + 150);
+
+    // ----------------- RAIN SETUP -----------------
+    struct RainDrop {
+        CircleShape shape;
+        float speed;
+    };
+    vector<RainDrop> rain;
+    int rainCount = 80; 
+    for (int i = 0; i < rainCount; i++) {
+        RainDrop rd;
+        rd.shape.setRadius(2.5f);
+        rd.shape.setFillColor(Color(173, 216, 230, 180)); 
+        rd.shape.setPosition(rand() % int(WIDTH + 500), rand() % int(HEIGHT));
+        rd.speed = 300 + rand() % 200;
+        rain.push_back(rd);
+    }
 
     while (window.isOpen())
     {
@@ -366,28 +342,28 @@ int main()
             btnOptions.setScale(0.8f, 0.8f);
             btnStart.setScale(0.8f, 0.8f);
 
-
-            // Update hover states
             btnStart.setTexture(btnStart.getGlobalBounds().contains(mousePos.x, mousePos.y) ? tStartHover : tStart);
             btnOptions.setTexture(btnOptions.getGlobalBounds().contains(mousePos.x, mousePos.y) ? tOptionsHover : tOptions);
             btnExit.setTexture(btnExit.getGlobalBounds().contains(mousePos.x, mousePos.y) ? tExitHover : tExit);
 
-            // Draw buttons
             window.draw(btnStart);
             window.draw(btnOptions);
             window.draw(btnExit);
 
-            // Mouse click actions
             if (Mouse::isButtonPressed(Mouse::Left))
             {
-                if (btnStart.getGlobalBounds().contains(mousePos.x, mousePos.y))
-                    gameState = PLAYING;
+                if (btnStart.getGlobalBounds().contains(mousePos.x, mousePos.y)) gameState = PLAYING;
+                if (btnExit.getGlobalBounds().contains(mousePos.x, mousePos.y)) window.close();
+                if (btnOptions.getGlobalBounds().contains(mousePos.x, mousePos.y)) gameState = OPTIONS;
+            }
 
-                if (btnExit.getGlobalBounds().contains(mousePos.x, mousePos.y))
-                    window.close();
-
-                if (btnOptions.getGlobalBounds().contains(mousePos.x, mousePos.y))
-					gameState = OPTIONS;
+            // ---------- UPDATE AND DRAW RAIN ----------
+            for (auto& rd : rain) {
+                rd.shape.move(rd.speed/2 * -dt, rd.speed * dt);
+                if (rd.shape.getPosition().y > HEIGHT) {
+                    rd.shape.setPosition(rand() % int(WIDTH + 500), -10.f);
+                }
+                window.draw(rd.shape);
             }
         }
         else if (gameState == PLAYING)
@@ -396,8 +372,7 @@ int main()
             player.onGround = false;
 
             player.platformCollision(ground);
-            for (auto& p : platforms)
-                player.platformCollision(p);
+            for (auto& p : platforms) player.platformCollision(p);
 
             player.updateAnimation();
 
@@ -415,10 +390,8 @@ int main()
             window.setView(camera);
 
             bg.draw(window);
-
             ground.draw(window);
             for (auto& p : platforms) p.draw(window);
-
             player.draw(window);
         }
 
