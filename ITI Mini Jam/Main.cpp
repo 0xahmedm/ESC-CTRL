@@ -1,7 +1,28 @@
-#include <SFML/Graphics.hpp>
+﻿#include <SFML/Graphics.hpp>
 #include <iostream>
 using namespace sf;
 using namespace std;
+
+/* ---------------------------------------------------
+      PLATFORM CLASS
+--------------------------------------------------- */
+class Platform
+{
+public:
+    RectangleShape body;
+
+    Platform(float x, float y, float width, float height, Color color)
+    {
+        body.setSize({ width, height });
+        body.setPosition(x, y);
+        body.setFillColor(color);
+    }
+
+    void draw(RenderWindow& win)
+    {
+        win.draw(body);
+    }
+};
 
 /* ---------------------------------------------------
       PARALLAX BACKGROUND CLASS
@@ -58,45 +79,43 @@ public:
     }
 };
 
-
 /* ---------------------------------------------------
                  PLAYER CLASS
 --------------------------------------------------- */
-
 class Player
 {
 public:
-    // Animation textures
     Texture tIdle, tRun, tJump;
 
     Sprite sprite;
     RectangleShape hitbox;
 
-    int frameW = 32;
-    int frameH = 32;
+    int frameW = 1024;
+    int frameH = 1024;
 
-    int framesIdle = 11;
-    int framesRun = 12;
-    int framesJump = 1;
+    int framesIdle = 3;
+    int framesRun = 6;
+    int framesJump = 6;
 
     int currentState = 0;
 
     enum State { IDLE, RUN, JUMP };
 
     float timeSince = 0;
-    float animSpeed = 0.05f;
+    float animSpeed = 0.09f;
     int currentFrame = 0;
-    int maxFrames = 11;
+    int maxFrames = 6;
 
     bool facingRight = true;
     bool onGround = false;
 
-    float speed = 2.f;
+    float speed = 5.f;
     float gravity = 0.6f;
     float velY = 0.f;
 
     Clock animClock;
 
+    float spriteScale = 0.14f;
 
     Player()
     {
@@ -109,10 +128,10 @@ public:
 
         sprite.setTexture(tIdle);
         sprite.setTextureRect(IntRect(0, 0, frameW, frameH));
-        sprite.setScale(3.f, 3.f);
+        sprite.setScale(spriteScale, spriteScale);
         sprite.setOrigin(frameW / 2.f, frameH / 2.f);
 
-        hitbox.setSize({ 40.f, 80.f });
+        hitbox.setSize({ 40.f, 110.f });
         hitbox.setOrigin(20, 40);
         hitbox.setPosition(300, 300);
         hitbox.setFillColor(Color::Transparent);
@@ -120,26 +139,25 @@ public:
         maxFrames = framesIdle;
     }
 
-
     void updateMovement()
     {
         bool moving = false;
 
-        if (Keyboard::isKeyPressed(Keyboard::A))
+        if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left))
         {
             hitbox.move(-speed, 0);
             facingRight = false;
             moving = true;
         }
 
-        if (Keyboard::isKeyPressed(Keyboard::D))
+        if (Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right))
         {
             hitbox.move(speed, 0);
             facingRight = true;
             moving = true;
         }
 
-        if (Keyboard::isKeyPressed(Keyboard::Space) && onGround)
+        if ((Keyboard::isKeyPressed(Keyboard::Space) || Keyboard::isKeyPressed(Keyboard::W) || Keyboard::isKeyPressed(Keyboard::Up)) && onGround)
         {
             velY = -16.f;
             onGround = false;
@@ -148,7 +166,6 @@ public:
         velY += gravity;
         hitbox.move(0, velY);
 
-        // Update animation state
         int newState = currentState;
         if (!onGround)
             newState = JUMP;
@@ -177,10 +194,16 @@ public:
         }
     }
 
-
     void updateAnimation()
     {
         timeSince += animClock.restart().asSeconds();
+
+        if (currentState == IDLE)
+            animSpeed = 0.19f;
+        else if (currentState == RUN)
+            animSpeed = 0.09f;
+        else
+            animSpeed = 0.09f;
 
         if (timeSince >= animSpeed)
         {
@@ -192,28 +215,56 @@ public:
         sprite.setTextureRect(IntRect(currentFrame * frameW, 0, frameW, frameH));
 
         if (facingRight)
-            sprite.setScale(3.f, 3.f);
+            sprite.setScale(spriteScale, spriteScale);
         else
-            sprite.setScale(-3.f, 3.f);
+            sprite.setScale(-spriteScale, spriteScale);
 
         sprite.setPosition(hitbox.getPosition());
     }
 
-
-    void groundCollision(const RectangleShape& ground)
+    void platformCollision(const Platform& p)
     {
-        if (hitbox.getGlobalBounds().intersects(ground.getGlobalBounds()))
-        {
-            float groundTop = ground.getPosition().y;
-            float half = hitbox.getSize().y / 2;
+        FloatRect hb = hitbox.getGlobalBounds();
+        FloatRect pb = p.body.getGlobalBounds();
 
-            hitbox.setPosition(hitbox.getPosition().x, groundTop - half);
-            velY = 0;
-            onGround = true;
+        if (!hb.intersects(pb)) return;
+
+        float hbLeft = hb.left;
+        float hbRight = hb.left + hb.width;
+        float hbTop = hb.top;
+        float hbBottom = hb.top + hb.height;
+
+        float pbLeft = pb.left;
+        float pbRight = pb.left + pb.width;
+        float pbTop = pb.top;
+        float pbBottom = pb.top + pb.height;
+
+        float overlapLeft = hbRight - pbLeft;
+        float overlapRight = pbRight - hbLeft;
+        float overlapTop = hbBottom - pbTop;
+        float overlapBottom = pbBottom - hbTop;
+
+        float minOverlapX = min(overlapLeft, overlapRight);
+        float minOverlapY = min(overlapTop, overlapBottom);
+
+        if (minOverlapX < minOverlapY) {
+            if (overlapLeft < overlapRight)
+                hitbox.move(-overlapLeft, 0);
+            else
+                hitbox.move(overlapRight, 0);
         }
-        else onGround = false;
+        else {
+            if (overlapTop < overlapBottom) {
+                hitbox.move(0, -overlapTop);
+                velY = 0;
+                onGround = true;
+            }
+            else {
+                hitbox.move(0, overlapBottom);
+                velY = 0;
+            }
+        }
     }
-
 
     void draw(RenderWindow& win)
     {
@@ -221,11 +272,9 @@ public:
     }
 };
 
-
 /* ---------------------------------------------------
                      MAIN GAME LOOP
 --------------------------------------------------- */
-
 int main()
 {
     auto mode = VideoMode::getDesktopMode();
@@ -235,19 +284,58 @@ int main()
     RenderWindow window(mode, "ESC CTRL", Style::Fullscreen);
     window.setFramerateLimit(60);
 
-    // Background system
-    vector<float> speeds = { 0, 50, 100, 150 };
-    ParallaxBackground bg(4, WIDTH, HEIGHT, speeds);
+    View camera;
+    camera.setSize(WIDTH, HEIGHT);
+    camera.setCenter(WIDTH / 2, HEIGHT / 2);
 
-    // Player
+    float WORLD_LEFT = 0;
+    float WORLD_RIGHT = WIDTH * 10000;
+
+    // --- Player ---
     Player player;
 
-    // Ground
-    RectangleShape ground({ WIDTH - 100, 100 });
-    ground.setPosition(50, HEIGHT - 100);
-    ground.setFillColor(Color(50, 50, 50));
+    vector<float> speeds = { 0, 25 , 60, 110 , 120, 130, 140 };
+    ParallaxBackground bg(7, WIDTH * 10000, HEIGHT, speeds);
+
+    Platform ground(50, HEIGHT - 200, WORLD_RIGHT - 100, 200, Color(0, 0, 0, 0));
+
+    vector<Platform> platforms;
+    platforms.emplace_back(800, HEIGHT - 250, 300, 40, Color(50, 50, 50));
+    platforms.emplace_back(1400, HEIGHT - 350, 250, 40, Color(50, 50, 50));
+    platforms.emplace_back(2000, HEIGHT - 200, 400, 40, Color(50, 50, 50));
 
     Clock dtClock;
+
+    // --- MAIN MENU SETUP ---
+    enum GameState { MENU, PLAYING, OPTIONS };
+    GameState gameState = MENU;
+
+    // Button textures
+    Texture tStart, tStartHover, tOptions, tOptionsHover, tExit, tExitHover;
+    if (!tStart.loadFromFile("Assets/Buttons/start.png") ||
+        !tStartHover.loadFromFile("Assets/Buttons/start_hover.png") ||
+        !tOptions.loadFromFile("Assets/Buttons/options.png") ||
+        !tOptionsHover.loadFromFile("Assets/Buttons/options_hover.png") ||
+        !tExit.loadFromFile("Assets/Buttons/exit.png") ||
+        !tExitHover.loadFromFile("Assets/Buttons/exit_hover.png"))
+    {
+        cerr << "Error loading button textures!" << endl;
+    }
+
+    Sprite btnStart(tStart), btnOptions(tOptions), btnExit(tExit);
+
+	btnExit.setScale(0.8f, 0.8f);
+	btnOptions.setScale(0.8f, 0.8f);
+	btnStart.setScale(0.8f, 0.8f);
+
+
+    btnStart.setOrigin(tStart.getSize().x / 2.f, tStart.getSize().y / 2.f);
+    btnOptions.setOrigin(tOptions.getSize().x / 2.f, tOptions.getSize().y / 2.f);
+    btnExit.setOrigin(tExit.getSize().x / 2.f, tExit.getSize().y / 2.f);
+
+    btnStart.setPosition(WIDTH / 2, HEIGHT / 2 - 175);
+    btnOptions.setPosition(WIDTH / 2, HEIGHT / 2);
+    btnExit.setPosition(WIDTH / 2, HEIGHT / 2 + 175);
 
     while (window.isOpen())
     {
@@ -261,26 +349,67 @@ int main()
 
         float dt = dtClock.restart().asSeconds();
 
-        // Player movement
-        player.updateMovement();
-        player.groundCollision(ground);
-        player.updateAnimation();
-
-        // Parallax scrolling
-        float direction = 0;
-        if (Keyboard::isKeyPressed(Keyboard::A)) direction = -1;
-        else if (Keyboard::isKeyPressed(Keyboard::D)) direction = 1;
-
-        if (direction != 0)
-            bg.update(dt, direction, 2, bg.layerCount);
-
-        bg.update(dt, -1, 0, 2);
-
-        // Render
         window.clear();
-        bg.draw(window);
-        window.draw(ground);
-        player.draw(window);
+
+        if (gameState == MENU)
+        {
+            Vector2i mousePos = Mouse::getPosition(window);
+
+            // Update hover states
+            btnStart.setTexture(btnStart.getGlobalBounds().contains(mousePos.x, mousePos.y) ? tStartHover : tStart);
+            btnOptions.setTexture(btnOptions.getGlobalBounds().contains(mousePos.x, mousePos.y) ? tOptionsHover : tOptions);
+            btnExit.setTexture(btnExit.getGlobalBounds().contains(mousePos.x, mousePos.y) ? tExitHover : tExit);
+
+            // Draw buttons
+            window.draw(btnStart);
+            window.draw(btnOptions);
+            window.draw(btnExit);
+
+            // Mouse click actions
+            if (Mouse::isButtonPressed(Mouse::Left))
+            {
+                if (btnStart.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                    gameState = PLAYING;
+
+                if (btnExit.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                    window.close();
+
+                if (btnOptions.getGlobalBounds().contains(mousePos.x, mousePos.y))
+                    cout << "Options button clicked!" << endl;
+            }
+        }
+        else if (gameState == PLAYING)
+        {
+            player.updateMovement();
+            player.onGround = false;
+
+            player.platformCollision(ground);
+            for (auto& p : platforms)
+                player.platformCollision(p);
+
+            player.updateAnimation();
+
+            float direction = 0;
+            if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left)) direction = -1;
+            else if (Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right)) direction = 1;
+
+            if (direction != 0) bg.update(dt, direction, 2, bg.layerCount);
+            bg.update(dt, -1, 0, 2);
+
+            float px = player.hitbox.getPosition().x;
+            px = max(px, WORLD_LEFT + WIDTH / 2);
+            px = min(px, WORLD_RIGHT - WIDTH / 2);
+            camera.setCenter(px, HEIGHT / 2);
+            window.setView(camera);
+
+            bg.draw(window);
+
+            ground.draw(window);
+            for (auto& p : platforms) p.draw(window);
+
+            player.draw(window);
+        }
+
         window.display();
     }
 
