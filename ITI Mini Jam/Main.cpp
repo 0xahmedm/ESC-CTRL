@@ -92,170 +92,6 @@ public:
     }
 };
 
-/* ---------------------------------------------------
-                 PLAYER CLASS
---------------------------------------------------- */
-class Player
-{
-public:
-    Texture tIdle, tRun, tJump;
-    Sprite sprite;
-    RectangleShape hitbox;
-    int frameW = 1024, frameH = 1024;
-    int framesIdle = 3, framesRun = 6, framesJump = 6;
-    int currentState = 0;
-    enum State { IDLE, RUN, JUMP };
-    float timeSince = 0, animSpeed = 0.09f;
-    int currentFrame = 0, maxFrames = 6;
-    bool facingRight = true, onGround = false;
-    float speed = 5.f, gravity = 0.6f, velY = 0.f;
-    Clock animClock;
-    float spriteScale = 0.2f;
-
-    Player()
-    {
-        // try to load; user may replace paths later
-        if (!tIdle.loadFromFile("Assets/Character/idle.png"))
-            cerr << "Warning: idle.png not found (player texture placeholder)\n";
-        if (!tRun.loadFromFile("Assets/Character/run.png"))
-            cerr << "Warning: run.png not found (player texture placeholder)\n";
-        if (!tJump.loadFromFile("Assets/Character/jump.png"))
-            cerr << "Warning: jump.png not found (player texture placeholder)\n";
-
-        sprite.setTexture(tIdle);
-        sprite.setTextureRect(IntRect(0, 0, frameW, frameH));
-        sprite.setScale(spriteScale, spriteScale);
-        sprite.setOrigin(frameW / 2.f, frameH / 2.f);
-
-        hitbox.setSize({ 40.f, 150.f });
-        hitbox.setOrigin(20.f, 40.f);
-        hitbox.setPosition(300.f, 300.f);
-        hitbox.setFillColor(Color::Transparent);
-
-        maxFrames = framesIdle;
-    }
-
-    void updateMovement()
-    {
-        bool moving = false;
-
-        if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left))
-        {
-            hitbox.move(-speed, 0);
-            facingRight = false;
-            moving = true;
-        }
-
-        if (Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right))
-        {
-            hitbox.move(speed, 0);
-            facingRight = true;
-            moving = true;
-        }
-
-        if ((Keyboard::isKeyPressed(Keyboard::Space) || Keyboard::isKeyPressed(Keyboard::W) || Keyboard::isKeyPressed(Keyboard::Up)) && onGround)
-        {
-            velY = -16.f;
-            onGround = false;
-        }
-
-        velY += gravity;
-        hitbox.move(0, velY);
-
-        int newState = currentState;
-        if (!onGround)
-            newState = JUMP;
-        else if (moving)
-            newState = RUN;
-        else
-            newState = IDLE;
-
-        if (newState != currentState)
-        {
-            currentState = newState;
-            currentFrame = 0;
-
-            if (currentState == IDLE) { sprite.setTexture(tIdle); maxFrames = framesIdle; }
-            if (currentState == RUN) { sprite.setTexture(tRun); maxFrames = framesRun; }
-            if (currentState == JUMP) { sprite.setTexture(tJump); maxFrames = framesJump; }
-        }
-    }
-
-    void updateAnimation()
-    {
-        timeSince += animClock.restart().asSeconds();
-
-        if (currentState == IDLE) animSpeed = 0.19f;
-        else if (currentState == RUN) animSpeed = 0.09f;
-        else animSpeed = 0.09f;
-
-        if (timeSince >= animSpeed)
-        {
-            timeSince = 0;
-            currentFrame++;
-            if (currentFrame >= maxFrames) currentFrame = 0;
-        }
-
-        sprite.setTextureRect(IntRect(currentFrame * frameW, 0, frameW, frameH));
-        sprite.setScale(facingRight ? spriteScale : -spriteScale, spriteScale);
-        sprite.setPosition(hitbox.getPosition());
-    }
-
-    void draw(RenderWindow& win)
-    {
-        win.draw(sprite);
-    }
-
-    FloatRect getGlobalBounds() const { return hitbox.getGlobalBounds(); }
-    Vector2f getPosition() const { return hitbox.getPosition(); }
-    void move(float dx, float dy) { hitbox.move(dx, dy); }
-    void setPosition(float x, float y) { hitbox.setPosition(x, y); sprite.setPosition(x, y); }
-};
-
-/* ---------------------------------------------------
-                RAIN SYSTEM
---------------------------------------------------- */
-
-struct RainDrop {
-    CircleShape shape;
-    float speed;
-};
-
-class RainSystem {
-public:
-    vector<RainDrop> drops;
-    float WIDTH, HEIGHT;
-
-    RainSystem(int count, float W, float H)
-        : WIDTH(W), HEIGHT(H)
-    {
-        srand((unsigned)time(nullptr));
-        for (int i = 0; i < count; i++) {
-            RainDrop rd;
-            rd.shape.setRadius(2.5f);
-            rd.shape.setFillColor(Color(173, 216, 230, 180));
-            rd.shape.setPosition(rand() % int(WIDTH + 500), rand() % int(HEIGHT));
-            rd.speed = 300 + rand() % 200;
-            drops.push_back(rd);
-        }
-    }
-
-    void update(float dt)
-    {
-        for (auto& rd : drops)
-        {
-            rd.shape.move(rd.speed / 2.f * -dt, rd.speed * dt);
-            if (rd.shape.getPosition().y > HEIGHT)
-                rd.shape.setPosition(rand() % int(WIDTH + 500), -10.f);
-        }
-    }
-
-    void draw(RenderWindow& win)
-    {
-        for (auto& rd : drops)
-            win.draw(rd.shape);
-    }
-};
 
 /* ---------------------------------------------------
                 SOUND MANAGER
@@ -287,11 +123,11 @@ public:
             cerr << "Warning: game_music.ogg not found\n";
 
         // Reserve keys for common SFX (load may fail and will be warned)
-        ensureBuffer("button_click", "Assets/Audio/button_click.wav");
-        ensureBuffer("jump", "Assets/Audio/jump.wav");
-        ensureBuffer("run", "Assets/Audio/run.wav");
-        ensureBuffer("landing", "Assets/Audio/landing.wav");
-        ensureBuffer("rain", "Assets/Audio/rain_loop.wav");
+        ensureBuffer("button_click", "Assets/SFX/button_click.mp3");
+        ensureBuffer("jump", "Assets/SFX/jump.mp3");
+        ensureBuffer("run", "Assets/SFX/run.ogg.opus");
+        ensureBuffer("landing", "Assets/SFX/landing.mp3");
+        ensureBuffer("rain", "Assets/SFX/rain.mp3");
 
         applyVolumes();
     }
@@ -379,6 +215,176 @@ public:
         for (auto& [k, s] : sounds) {
             s.setVolume(sfxVolume);
         }
+    }
+};
+
+
+/* ---------------------------------------------------
+                 PLAYER CLASS
+--------------------------------------------------- */
+class Player
+{
+public:
+    Texture tIdle, tRun, tJump;
+    Sprite sprite;
+    RectangleShape hitbox;
+    int frameW = 1024, frameH = 1024;
+    int framesIdle = 3, framesRun = 6, framesJump = 6;
+    int currentState = 0;
+    enum State { IDLE, RUN, JUMP };
+    float timeSince = 0, animSpeed = 0.09f;
+    int currentFrame = 0, maxFrames = 6;
+    bool facingRight = true, onGround = false;
+    float speed = 5.f, gravity = 0.6f, velY = 0.f;
+    Clock animClock;
+    float spriteScale = 0.2f;
+	SoundManager* soundMgr = nullptr;
+
+    Player(SoundManager* manager = nullptr)
+    {
+        // try to load; user may replace paths later
+        if (!tIdle.loadFromFile("Assets/Character/idle.png"))
+            cerr << "Warning: idle.png not found (player texture placeholder)\n";
+        if (!tRun.loadFromFile("Assets/Character/run.png"))
+            cerr << "Warning: run.png not found (player texture placeholder)\n";
+        if (!tJump.loadFromFile("Assets/Character/jump.png"))
+            cerr << "Warning: jump.png not found (player texture placeholder)\n";
+
+        sprite.setTexture(tIdle);
+        sprite.setTextureRect(IntRect(0, 0, frameW, frameH));
+        sprite.setScale(spriteScale, spriteScale);
+        sprite.setOrigin(frameW / 2.f, frameH / 2.f);
+
+        hitbox.setSize({ 40.f, 150.f });
+        hitbox.setOrigin(20.f, 40.f);
+        hitbox.setPosition(300.f, 300.f);
+        hitbox.setFillColor(Color::Transparent);
+
+        maxFrames = framesIdle;
+    }
+
+    void updateMovement()
+    {
+        bool moving = false;
+
+        if (Keyboard::isKeyPressed(Keyboard::A) || Keyboard::isKeyPressed(Keyboard::Left))
+        {
+            hitbox.move(-speed, 0);
+            facingRight = false;
+            moving = true;
+			if (soundMgr) soundMgr->playSFX("run");
+        }
+
+        if (Keyboard::isKeyPressed(Keyboard::D) || Keyboard::isKeyPressed(Keyboard::Right))
+        {
+            hitbox.move(speed, 0);
+            facingRight = true;
+            moving = true;
+            if (soundMgr) soundMgr->playSFX("run");
+
+        }
+
+        if ((Keyboard::isKeyPressed(Keyboard::Space) || Keyboard::isKeyPressed(Keyboard::W) || Keyboard::isKeyPressed(Keyboard::Up)) && onGround)
+        {
+            velY = -16.f;
+            onGround = false;
+        }
+
+        velY += gravity;
+        hitbox.move(0, velY);
+
+        int newState = currentState;
+        if (!onGround)
+            newState = JUMP;
+        else if (moving)
+            newState = RUN;
+        else
+            newState = IDLE;
+
+        if (newState != currentState)
+        {
+            currentState = newState;
+            currentFrame = 0;
+
+            if (currentState == IDLE) { sprite.setTexture(tIdle); maxFrames = framesIdle; }
+            if (currentState == RUN) { sprite.setTexture(tRun); maxFrames = framesRun;  }
+            if (currentState == JUMP) { sprite.setTexture(tJump); maxFrames = framesJump; }
+        }
+    }
+
+    void updateAnimation()
+    {
+        timeSince += animClock.restart().asSeconds();
+
+        if (currentState == IDLE) animSpeed = 0.19f;
+        else if (currentState == RUN) animSpeed = 0.09f;
+        else animSpeed = 0.09f;
+
+        if (timeSince >= animSpeed)
+        {
+            timeSince = 0;
+            currentFrame++;
+            if (currentFrame >= maxFrames) currentFrame = 0;
+        }
+
+        sprite.setTextureRect(IntRect(currentFrame * frameW, 0, frameW, frameH));
+        sprite.setScale(facingRight ? spriteScale : -spriteScale, spriteScale);
+        sprite.setPosition(hitbox.getPosition());
+    }
+
+    void draw(RenderWindow& win)
+    {
+        win.draw(sprite);
+    }
+
+    FloatRect getGlobalBounds() const { return hitbox.getGlobalBounds(); }
+    Vector2f getPosition() const { return hitbox.getPosition(); }
+    void move(float dx, float dy) { hitbox.move(dx, dy); }
+    void setPosition(float x, float y) { hitbox.setPosition(x, y); sprite.setPosition(x, y); }
+};
+
+/* ---------------------------------------------------
+                RAIN SYSTEM
+--------------------------------------------------- */
+
+struct RainDrop {
+    CircleShape shape;
+    float speed;
+};
+
+class RainSystem {
+public:
+    vector<RainDrop> drops;
+    float WIDTH, HEIGHT;
+
+    RainSystem(int count, float W, float H)
+        : WIDTH(W), HEIGHT(H)
+    {
+        srand((unsigned)time(nullptr));
+        for (int i = 0; i < count; i++) {
+            RainDrop rd;
+            rd.shape.setRadius(2.5f);
+            rd.shape.setFillColor(Color(173, 216, 230, 180));
+            rd.shape.setPosition(rand() % int(WIDTH + 500), rand() % int(HEIGHT));
+            rd.speed = 300 + rand() % 200;
+            drops.push_back(rd);
+        }
+    }
+
+    void update(float dt)
+    {
+        for (auto& rd : drops)
+        {
+            rd.shape.move(rd.speed / 2.f * -dt, rd.speed * dt);
+            if (rd.shape.getPosition().y > HEIGHT)
+                rd.shape.setPosition(rand() % int(WIDTH + 500), -10.f);
+        }
+    }
+
+    void draw(RenderWindow& win)
+    {
+        for (auto& rd : drops)
+            win.draw(rd.shape);
     }
 };
 
@@ -778,6 +784,7 @@ public:
         ground(50.f, H - 200.f, W * 10000.f - 100.f, 200.f, Color(0, 0, 0, 0))
     {
         soundMgr = sm;
+		player.soundMgr = sm;
         WORLD_RIGHT = WIDTH * 10000.f;
 
         camera.setSize(WIDTH, HEIGHT);

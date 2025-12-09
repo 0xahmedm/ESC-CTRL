@@ -1,6 +1,6 @@
 ﻿  Main.cpp
-G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(237,68): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(237,41): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(238,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(249,45): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(368,68): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(368,41): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(369,28): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+G:\iti\ITI Mini Jam\ITI Mini Jam\Main.cpp(380,45): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
   ITI Mini Jam.vcxproj -> G:\iti\ITI Mini Jam\x64\Debug\ITI Mini Jam.exe
