@@ -239,9 +239,16 @@ public:
     }
 };
 
+struct RainDrop {
+    CircleShape shape;
+    float speed;
+};
+
 /* ---------------------------------------------------
                      MAIN GAME LOOP
 --------------------------------------------------- */
+
+
 int main()
 {
     auto mode = VideoMode::getDesktopMode();
@@ -297,15 +304,12 @@ int main()
     btnOptions.setOrigin(tOptions.getSize().x / 2.f, tOptions.getSize().y / 2.f);
     btnExit.setOrigin(tExit.getSize().x / 2.f, tExit.getSize().y / 2.f);
 
-    btnStart.setPosition((WIDTH / 2) + 350, ((HEIGHT / 2) + 150) - 150);
+    btnStart.setPosition((WIDTH / 2) + 350, ((HEIGHT / 2)));
     btnOptions.setPosition((WIDTH / 2) + 350, (HEIGHT / 2) + 150);
-    btnExit.setPosition((WIDTH / 2) + 350, ((HEIGHT / 2) + 150) + 150);
+    btnExit.setPosition((WIDTH / 2) + 350, ((HEIGHT / 2) + 300));
 
     // ----------------- RAIN SETUP -----------------
-    struct RainDrop {
-        CircleShape shape;
-        float speed;
-    };
+
     vector<RainDrop> rain;
     int rainCount = 80; 
     for (int i = 0; i < rainCount; i++) {
