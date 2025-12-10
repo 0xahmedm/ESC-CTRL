@@ -34,6 +34,24 @@ Menu::Menu(float WIDTH, float HEIGHT, SoundManager* sm)
     else btnExit.rect.setTexture(&tExit);
 
     if (!tExitHover.loadFromFile("Assets/Buttons/exit_hover.png")) { /*fallback*/ }
+
+    // Load the title texture and set its position
+    if (!tTitle.loadFromFile("Assets/Title.png")) {
+        cerr << "Warning: Title.png not found\n";
+    }
+    else {
+        sTitle.setTexture(tTitle);
+        float scaleFactor = 0.4f;
+        sTitle.setScale(scaleFactor, scaleFactor);
+
+        float scaledW = tTitle.getSize().x * scaleFactor;
+        float scaledH = tTitle.getSize().y * scaleFactor;
+
+        sTitle.setPosition(
+            WIDTH / 2.f - scaledW / 2.f + 350.f,
+            btnStart.rect.getPosition().y - scaledH - 120.f
+        );
+    }
 }
 
 int Menu::update(RenderWindow& window)
@@ -79,6 +97,8 @@ void Menu::draw(RenderWindow& window)
     btnStart.draw(window);
     btnOptions.draw(window);
     btnExit.draw(window);
+    // Draw the title sprite
+    if (tTitle.getSize().x) window.draw(sTitle);
 }
 
 
