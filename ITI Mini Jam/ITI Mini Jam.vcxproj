@@ -129,7 +129,33 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CollisionManager.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameOverScreen.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Obstacle.cpp" />
+    <ClCompile Include="OptionsMenu.cpp" />
+    <ClCompile Include="ParallaxBackground.cpp" />
+    <ClCompile Include="Platform.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="RainSystem.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="UI.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CollisionManager.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameOverScreen.h" />
+    <ClInclude Include="Menu.h" />
+    <ClInclude Include="Obstacle.h" />
+    <ClInclude Include="OptionsMenu.h" />
+    <ClInclude Include="ParallaxBackground.h" />
+    <ClInclude Include="Platform.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="RainSystem.h" />
+    <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="UI.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
