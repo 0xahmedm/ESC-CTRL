@@ -28,14 +28,19 @@ Game::Game(float W, float H, SoundManager* sm)
     obstacles.emplace_back(1750.f, HEIGHT - 230.f, 90.f, 140.f);
     obstacles.emplace_back(2400.f, HEIGHT - 220.f, 90.f, 140.f);
 
-    Texture tex;
-    if (tex.loadFromFile("Assets/Props/Leaves1.png")) propTextures.push_back(tex);
+    // ---- LOAD PROP TEXTURES (FIXED) ----
+    propTextures.emplace_back();
+    propTextures.back().loadFromFile("Assets/Props/Leaves1.png");
 
-    if (tex.loadFromFile("Assets/Props/Tree.png")) propTextures.push_back(tex);
+    propTextures.emplace_back();
+    propTextures.back().loadFromFile("Assets/Props/Tree.png");
+
+    // ---- RANDOM PROPS ----
+    if (propTextures.empty()) return;
 
     srand((unsigned)(time(0)));
-    int numProps = 5000; 
-    
+    int numProps = 5000;
+
     for (int i = 0; i < numProps; i++) {
         Sprite s;
         int randomNumberToCReateBushesAndTrees = rand() % propTextures.size();
@@ -43,22 +48,23 @@ Game::Game(float W, float H, SoundManager* sm)
 
         float x = 100.f + (float)(rand()) / RAND_MAX * (WIDTH * 10000.f - 200.f);
         float y = 0;
-        if(randomNumberToCReateBushesAndTrees == 0){
+
+        if (randomNumberToCReateBushesAndTrees == 0) {
             float groundTop = HEIGHT - 200;
-            y = groundTop - s.getTexture()->getSize().y * 0.4f; 
-            s.setScale(0.4f, 0.4f); 
+            s.setScale(0.4f, 0.4f);
+            y = groundTop - s.getTexture()->getSize().y * 0.4f;
             s.setPosition(x, y);
             leavesProp.push_back(s);
         }
         else {
-			float groundTop = HEIGHT - 50;
+            float groundTop = HEIGHT - 50;
+            s.setScale(1.f, 1.f);
             y = groundTop - s.getTexture()->getSize().y;
-			s.setScale(1.f, 1.f); 
             s.setPosition(x, y);
             treesProp.push_back(s);
         }
-
     }
+
 }
 
 bool Game::update(float dt)

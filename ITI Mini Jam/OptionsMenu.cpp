@@ -9,7 +9,7 @@ using namespace std;
 OptionsMenu::OptionsMenu(float WIDTH, float HEIGHT, SoundManager* sm)
 {
     soundMgr = sm;
-    soundMgr->setMusicVolume(0.f);
+    soundMgr->setMusicVolume(10.f);
 	soundMgr->setSFXVolume(30.f);
 
     float centerX = WIDTH / 2.f;
