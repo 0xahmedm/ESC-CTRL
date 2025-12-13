@@ -9,15 +9,16 @@ using namespace std;
 OptionsMenu::OptionsMenu(float WIDTH, float HEIGHT, SoundManager* sm)
 {
     soundMgr = sm;
-	soundMgr->musicVolume = 100.f;
-	soundMgr->sfxVolume = 100.f;
+    soundMgr->setMusicVolume(0.f);
+	soundMgr->setSFXVolume(30.f);
 
     float centerX = WIDTH / 2.f;
     float baseY = HEIGHT / 2.f - 120.f;
 
-    musicSlider = Slider(centerX - 200.f, baseY + 20.f, 400.f, static_cast<int>(sm->musicVolume));
-    sfxSlider = Slider(centerX - 200.f, baseY + 150.f, 400.f, static_cast<int>(sm->sfxVolume));
+    musicSlider = Slider(centerX - 200.f, baseY + 20.f, 400.f, static_cast<int>(soundMgr->musicVolume));
+    sfxSlider = Slider(centerX - 200.f, baseY + 150.f, 400.f, static_cast<int>(soundMgr->sfxVolume));
 
+   
     backButton = UIButton({ 200.f, 70.f }, { centerX, baseY + 300.f }, Color(150, 150, 150));
 
     font = Font();

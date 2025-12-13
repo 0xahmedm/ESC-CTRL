@@ -34,7 +34,7 @@ Game::Game(float W, float H, SoundManager* sm)
     if (tex.loadFromFile("Assets/Props/Tree.png")) propTextures.push_back(tex);
 
     srand((unsigned)(time(0)));
-    int numProps = 10000; 
+    int numProps = 5000; 
     
     for (int i = 0; i < numProps; i++) {
         Sprite s;
@@ -97,17 +97,20 @@ void Game::draw(RenderWindow& window)
 
     ground.draw(window);   
 
-    for (auto& p : treesProp)
-        window.draw(p);
-    BGground.draw(window);
+    for (auto& tree : treesProp)
+        if (isVisible(tree))
+            window.draw(tree);
 
+    BGground.draw(window);
 
     for (auto& plat : platforms) plat.draw(window);
     for (auto& o : obstacles) o.draw(window);
 
 
-    for (auto& p : leavesProp)
-        window.draw(p);
+    for (auto& leaf : leavesProp)
+        if (isVisible(leaf))
+            window.draw(leaf);
+
     player.draw(window);
 }
 
@@ -133,6 +136,17 @@ bool Game::checkObstacleCollision()
         }
     }
     return false;
+}
+
+bool Game::isVisible(const sf::Sprite& sprite)
+{
+    sf::FloatRect camRect(
+        camera.getCenter().x - WIDTH / 2.f,
+        camera.getCenter().y - HEIGHT / 2.f,
+        WIDTH,
+        HEIGHT
+    );
+    return sprite.getGlobalBounds().intersects(camRect);
 }
 
 void Game::reset()

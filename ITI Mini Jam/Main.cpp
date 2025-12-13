@@ -16,7 +16,7 @@ int main()
     float HEIGHT = static_cast<float>(mode.height);
 
     RenderWindow window(mode, "ESC CTRL", Style::Fullscreen);
-    window.setFramerateLimit(60);
+    window.setFramerateLimit(90);
 
     SoundManager soundMgr;
     soundMgr.playMusic("menu", true);
